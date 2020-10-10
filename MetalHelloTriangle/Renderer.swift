@@ -7,15 +7,14 @@ class Renderer: NSObject, MTKViewDelegate {
     public let device: MTLDevice
     let commandQueue: MTLCommandQueue
     var pipelineState: MTLRenderPipelineState
-    var depthState: MTLDepthStencilState
+    
     var uniformBuffer: MTLBuffer
+    var uniforms: UnsafeMutablePointer<Uniforms>
     
     var vertexDescriptor = MTLVertexDescriptor()
     var indexBuffer: MTLBuffer
     var positionBuffer: MTLBuffer
     var colorBuffer: MTLBuffer
-    
-    var uniforms: UnsafeMutablePointer<Uniforms>
 
     init?(metalKitView: MTKView) {
         self.device = metalKitView.device!
@@ -67,11 +66,6 @@ class Renderer: NSObject, MTKViewDelegate {
             print("Unable to compile render pipeline state: \(error)")
             return nil
         }
-
-        let depthStateDescriptor = MTLDepthStencilDescriptor()
-        depthStateDescriptor.depthCompareFunction = MTLCompareFunction.less
-        depthStateDescriptor.isDepthWriteEnabled = true
-        depthState = device.makeDepthStencilState(descriptor:depthStateDescriptor)!
         
         let indices: [UInt16] = [0, 1, 2]
         let positions: [SIMD3<Float>] = [.init(-1, -1, 0), .init(1, -1, 0), .init(0, 1, 0)];
@@ -101,7 +95,6 @@ class Renderer: NSObject, MTKViewDelegate {
         renderEncoder.setFrontFacing(.counterClockwise)
         
         renderEncoder.setRenderPipelineState(pipelineState)
-        renderEncoder.setDepthStencilState(depthState)
         
         renderEncoder.setVertexBuffer(uniformBuffer, offset: 0, index: Int(BufferIndexUniforms))
         renderEncoder.setFragmentBuffer(uniformBuffer, offset: 0, index: Int(BufferIndexUniforms))
