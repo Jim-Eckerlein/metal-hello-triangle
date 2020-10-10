@@ -17,15 +17,15 @@ class Renderer: NSObject, MTKViewDelegate {
     var colorBuffer: MTLBuffer
 
     init?(metalKitView: MTKView) {
-        self.device = metalKitView.device!
-        self.commandQueue = device.makeCommandQueue()!
+        device = metalKitView.device!
+        commandQueue = device.makeCommandQueue()!
         
         metalKitView.depthStencilPixelFormat = MTLPixelFormat.depth32Float_stencil8
         metalKitView.colorPixelFormat = MTLPixelFormat.bgra8Unorm_srgb
         metalKitView.sampleCount = 1
 
-        self.uniformBuffer = device.makeBuffer(length: MemoryLayout<Uniforms>.stride, options: [MTLResourceOptions.storageModeShared])!
-        self.uniformBuffer.label = "UniformBuffer"
+        uniformBuffer = device.makeBuffer(length: MemoryLayout<Uniforms>.stride, options: [MTLResourceOptions.storageModeShared])!
+        uniformBuffer.label = "UniformBuffer"
         uniforms = UnsafeMutableRawPointer(uniformBuffer.contents()).bindMemory(to: Uniforms.self, capacity: 1)
         
         vertexDescriptor.attributes[Int(VertexAttributePosition)].format = MTLVertexFormat.float3
@@ -83,7 +83,7 @@ class Renderer: NSObject, MTKViewDelegate {
     }
 
     func draw(in view: MTKView) {
-        self.updateUniforms()
+        updateUniforms()
         
         let commandBuffer = commandQueue.makeCommandBuffer()!
         let renderEncoder = commandBuffer.makeRenderCommandEncoder(descriptor: view.currentRenderPassDescriptor!)!
