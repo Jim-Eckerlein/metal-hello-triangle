@@ -1,26 +1,13 @@
 #pragma once
 
-#ifdef __METAL_VERSION__
-#define NS_ENUM(_type, _name) enum _name : _type _name; enum _name : _type
-typedef metal::int32_t NSInteger;
-#else
-#import <Foundation/Foundation.h>
-#endif
-
 #include <simd/simd.h>
 
-typedef NS_ENUM(NSInteger, BufferIndex)
-{
-    BufferIndexMeshPositions = 0,
-    BufferIndexMeshColors    = 1,
-    BufferIndexUniforms      = 2
-};
+#define BufferIndexMeshPositions 0
+#define BufferIndexMeshColors 1
+#define BufferIndexUniforms 2
 
-typedef NS_ENUM(NSInteger, VertexAttribute)
-{
-    VertexAttributePosition  = 0,
-    VertexAttributeColor     = 1,
-};
+#define VertexAttributePosition 0
+#define VertexAttributeColor 1
 
 typedef struct
 {

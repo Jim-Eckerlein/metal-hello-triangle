@@ -29,21 +29,21 @@ class Renderer: NSObject, MTKViewDelegate {
         self.uniformBuffer.label = "UniformBuffer"
         uniforms = UnsafeMutableRawPointer(uniformBuffer.contents()).bindMemory(to: Uniforms.self, capacity: 1)
         
-        vertexDescriptor.attributes[VertexAttribute.position.rawValue].format = MTLVertexFormat.float3
-        vertexDescriptor.attributes[VertexAttribute.position.rawValue].offset = 0
-        vertexDescriptor.attributes[VertexAttribute.position.rawValue].bufferIndex = BufferIndex.meshPositions.rawValue
+        vertexDescriptor.attributes[Int(VertexAttributePosition)].format = MTLVertexFormat.float3
+        vertexDescriptor.attributes[Int(VertexAttributePosition)].offset = 0
+        vertexDescriptor.attributes[Int(VertexAttributePosition)].bufferIndex = Int(BufferIndexMeshPositions)
         
-        vertexDescriptor.attributes[VertexAttribute.color.rawValue].format = MTLVertexFormat.float3
-        vertexDescriptor.attributes[VertexAttribute.color.rawValue].offset = 0
-        vertexDescriptor.attributes[VertexAttribute.color.rawValue].bufferIndex = BufferIndex.meshColors.rawValue
+        vertexDescriptor.attributes[Int(VertexAttributeColor)].format = MTLVertexFormat.float3
+        vertexDescriptor.attributes[Int(VertexAttributeColor)].offset = 0
+        vertexDescriptor.attributes[Int(VertexAttributeColor)].bufferIndex = Int(BufferIndexMeshColors)
         
-        vertexDescriptor.layouts[BufferIndex.meshPositions.rawValue].stride = MemoryLayout<SIMD3<Float>>.stride
-        vertexDescriptor.layouts[BufferIndex.meshPositions.rawValue].stepRate = 1
-        vertexDescriptor.layouts[BufferIndex.meshPositions.rawValue].stepFunction = MTLVertexStepFunction.perVertex
+        vertexDescriptor.layouts[Int(BufferIndexMeshPositions)].stride = MemoryLayout<SIMD3<Float>>.stride
+        vertexDescriptor.layouts[Int(BufferIndexMeshPositions)].stepRate = 1
+        vertexDescriptor.layouts[Int(BufferIndexMeshPositions)].stepFunction = MTLVertexStepFunction.perVertex
         
-        vertexDescriptor.layouts[BufferIndex.meshColors.rawValue].stride = MemoryLayout<SIMD3<Float>>.stride
-        vertexDescriptor.layouts[BufferIndex.meshColors.rawValue].stepRate = 1
-        vertexDescriptor.layouts[BufferIndex.meshColors.rawValue].stepFunction = MTLVertexStepFunction.perVertex
+        vertexDescriptor.layouts[Int(BufferIndexMeshColors)].stride = MemoryLayout<SIMD3<Float>>.stride
+        vertexDescriptor.layouts[Int(BufferIndexMeshColors)].stepRate = 1
+        vertexDescriptor.layouts[Int(BufferIndexMeshColors)].stepFunction = MTLVertexStepFunction.perVertex
 
         let library = device.makeDefaultLibrary()!
         
@@ -103,10 +103,10 @@ class Renderer: NSObject, MTKViewDelegate {
         renderEncoder.setRenderPipelineState(pipelineState)
         renderEncoder.setDepthStencilState(depthState)
         
-        renderEncoder.setVertexBuffer(uniformBuffer, offset: 0, index: BufferIndex.uniforms.rawValue)
-        renderEncoder.setFragmentBuffer(uniformBuffer, offset: 0, index: BufferIndex.uniforms.rawValue)
-        renderEncoder.setVertexBuffer(positionBuffer, offset: 0, index: BufferIndex.meshPositions.rawValue)
-        renderEncoder.setVertexBuffer(colorBuffer, offset: 0, index: BufferIndex.meshColors.rawValue)
+        renderEncoder.setVertexBuffer(uniformBuffer, offset: 0, index: Int(BufferIndexUniforms))
+        renderEncoder.setFragmentBuffer(uniformBuffer, offset: 0, index: Int(BufferIndexUniforms))
+        renderEncoder.setVertexBuffer(positionBuffer, offset: 0, index: Int(BufferIndexMeshPositions))
+        renderEncoder.setVertexBuffer(colorBuffer, offset: 0, index: Int(BufferIndexMeshColors))
         
         renderEncoder.drawIndexedPrimitives(type: .triangle, indexCount: 3, indexType: .uint16, indexBuffer: indexBuffer, indexBufferOffset: 0)
         
