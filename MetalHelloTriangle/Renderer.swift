@@ -108,48 +108,34 @@ class Renderer: NSObject, MTKViewDelegate {
         uniforms[0].transform = .init(diagonal: .init(x: 0.5, y: 0.5, z: 0.5, w: 1))
     }
 
-    func draw(in view: MTKView) {        
-        if let commandBuffer = commandQueue.makeCommandBuffer() {
-            self.updateUniforms()
-            
-            /// Delay getting the currentRenderPassDescriptor until we absolutely need it to avoid
-            ///   holding onto the drawable and blocking the display pipeline any longer than necessary
-            let renderPassDescriptor = view.currentRenderPassDescriptor
-            
-            if let renderPassDescriptor = renderPassDescriptor {
-                
-                /// Final pass rendering code here
-                guard let renderEncoder = commandBuffer.makeRenderCommandEncoder(descriptor: renderPassDescriptor) else {
-                    return
-                }
-                
-                renderEncoder.label = "Primary Render Encoder"
-                renderEncoder.pushDebugGroup("Draw Triangle")
-                
-                renderEncoder.setCullMode(.back)
-                renderEncoder.setFrontFacing(.counterClockwise)
-                
-                renderEncoder.setRenderPipelineState(pipelineState)
-                renderEncoder.setDepthStencilState(depthState)
-                
-                renderEncoder.setVertexBuffer(dynamicUniformBuffer, offset: 0, index: BufferIndex.uniforms.rawValue)
-                renderEncoder.setFragmentBuffer(dynamicUniformBuffer, offset: 0, index: BufferIndex.uniforms.rawValue)
-                renderEncoder.setVertexBuffer(positionBuffer, offset: 0, index: BufferIndex.meshPositions.rawValue)
-                renderEncoder.setVertexBuffer(colorBuffer, offset: 0, index: BufferIndex.meshColors.rawValue)
-                
-                renderEncoder.drawIndexedPrimitives(type: .triangle, indexCount: 3, indexType: .uint16, indexBuffer: indexBuffer, indexBufferOffset: 0)
-                
-                renderEncoder.popDebugGroup()
-                renderEncoder.endEncoding()
-                
-                if let drawable = view.currentDrawable {
-                    commandBuffer.present(drawable)
-                }
-            }
-            
-            commandBuffer.commit()
-            commandBuffer.waitUntilCompleted()
-        }
+    func draw(in view: MTKView) {
+        self.updateUniforms()
+        
+        let commandBuffer = commandQueue.makeCommandBuffer()!
+        let renderEncoder = commandBuffer.makeRenderCommandEncoder(descriptor: view.currentRenderPassDescriptor!)!
+        
+        renderEncoder.label = "Primary Render Encoder"
+        renderEncoder.pushDebugGroup("Draw Triangle")
+        
+        renderEncoder.setCullMode(.back)
+        renderEncoder.setFrontFacing(.counterClockwise)
+        
+        renderEncoder.setRenderPipelineState(pipelineState)
+        renderEncoder.setDepthStencilState(depthState)
+        
+        renderEncoder.setVertexBuffer(dynamicUniformBuffer, offset: 0, index: BufferIndex.uniforms.rawValue)
+        renderEncoder.setFragmentBuffer(dynamicUniformBuffer, offset: 0, index: BufferIndex.uniforms.rawValue)
+        renderEncoder.setVertexBuffer(positionBuffer, offset: 0, index: BufferIndex.meshPositions.rawValue)
+        renderEncoder.setVertexBuffer(colorBuffer, offset: 0, index: BufferIndex.meshColors.rawValue)
+        
+        renderEncoder.drawIndexedPrimitives(type: .triangle, indexCount: 3, indexType: .uint16, indexBuffer: indexBuffer, indexBufferOffset: 0)
+        
+        renderEncoder.popDebugGroup()
+        renderEncoder.endEncoding()
+        
+        commandBuffer.present(view.currentDrawable!)
+        commandBuffer.commit()
+        commandBuffer.waitUntilCompleted()
     }
 
     func mtkView(_ view: MTKView, drawableSizeWillChange size: CGSize) {
