@@ -2,15 +2,6 @@ import Metal
 import MetalKit
 import simd
 
-// The 256 byte aligned size of our uniform structure
-let alignedUniformsSize = (MemoryLayout<Uniforms>.size + 0xFF) & -0x100
-
-let maxBuffersInFlight = 3
-
-enum RendererError: Error {
-    case badVertexDescriptor
-}
-
 class Renderer: NSObject, MTKViewDelegate {
 
     public let device: MTLDevice
@@ -23,25 +14,18 @@ class Renderer: NSObject, MTKViewDelegate {
     var indexBuffer: MTLBuffer
     var positionBuffer: MTLBuffer
     var colorBuffer: MTLBuffer
-
-    let inFlightSemaphore = DispatchSemaphore(value: maxBuffersInFlight)
-
-    var uniformBufferOffset = 0
-    var uniformBufferIndex = 0
+    
     var uniforms: UnsafeMutablePointer<Uniforms>
 
     init?(metalKitView: MTKView) {
         self.device = metalKitView.device!
         self.commandQueue = self.device.makeCommandQueue()!
 
-        let uniformBufferSize = alignedUniformsSize * maxBuffersInFlight
-
-        self.dynamicUniformBuffer = self.device.makeBuffer(length:uniformBufferSize,
-                                                           options:[MTLResourceOptions.storageModeShared])!
-
+        self.dynamicUniformBuffer = self.device.makeBuffer(length: MemoryLayout<Uniforms>.stride,
+                                                           options: [MTLResourceOptions.storageModeShared])!
         self.dynamicUniformBuffer.label = "UniformBuffer"
 
-        uniforms = UnsafeMutableRawPointer(dynamicUniformBuffer.contents()).bindMemory(to:Uniforms.self, capacity:1)
+        uniforms = UnsafeMutableRawPointer(dynamicUniformBuffer.contents()).bindMemory(to:Uniforms.self, capacity: 1)
 
         metalKitView.depthStencilPixelFormat = MTLPixelFormat.depth32Float_stencil8
         metalKitView.colorPixelFormat = MTLPixelFormat.bgra8Unorm_srgb
@@ -120,29 +104,12 @@ class Renderer: NSObject, MTKViewDelegate {
         return try device.makeRenderPipelineState(descriptor: pipelineDescriptor)
     }
 
-    private func updateDynamicBufferState() {
-        uniformBufferIndex = (uniformBufferIndex + 1) % maxBuffersInFlight
-        uniformBufferOffset = alignedUniformsSize * uniformBufferIndex
-        uniforms = UnsafeMutableRawPointer(dynamicUniformBuffer.contents() + uniformBufferOffset).bindMemory(to:Uniforms.self, capacity:1)
-    }
-
     private func updateUniforms() {
         uniforms[0].transform = .init(diagonal: .init(x: 0.5, y: 0.5, z: 0.5, w: 1))
     }
 
-    func draw(in view: MTKView) {
-        /// Per frame updates hare
-
-        _ = inFlightSemaphore.wait(timeout: DispatchTime.distantFuture)
-        
+    func draw(in view: MTKView) {        
         if let commandBuffer = commandQueue.makeCommandBuffer() {
-            let semaphore = inFlightSemaphore
-            commandBuffer.addCompletedHandler { (_ commandBuffer)-> Swift.Void in
-                semaphore.signal()
-            }
-            
-            self.updateDynamicBufferState()
-            
             self.updateUniforms()
             
             /// Delay getting the currentRenderPassDescriptor until we absolutely need it to avoid
@@ -165,8 +132,8 @@ class Renderer: NSObject, MTKViewDelegate {
                 renderEncoder.setRenderPipelineState(pipelineState)
                 renderEncoder.setDepthStencilState(depthState)
                 
-                renderEncoder.setVertexBuffer(dynamicUniformBuffer, offset: uniformBufferOffset, index: BufferIndex.uniforms.rawValue)
-                renderEncoder.setFragmentBuffer(dynamicUniformBuffer, offset: uniformBufferOffset, index: BufferIndex.uniforms.rawValue)
+                renderEncoder.setVertexBuffer(dynamicUniformBuffer, offset: 0, index: BufferIndex.uniforms.rawValue)
+                renderEncoder.setFragmentBuffer(dynamicUniformBuffer, offset: 0, index: BufferIndex.uniforms.rawValue)
                 renderEncoder.setVertexBuffer(positionBuffer, offset: 0, index: BufferIndex.meshPositions.rawValue)
                 renderEncoder.setVertexBuffer(colorBuffer, offset: 0, index: BufferIndex.meshColors.rawValue)
                 
@@ -181,6 +148,7 @@ class Renderer: NSObject, MTKViewDelegate {
             }
             
             commandBuffer.commit()
+            commandBuffer.waitUntilCompleted()
         }
     }
 
