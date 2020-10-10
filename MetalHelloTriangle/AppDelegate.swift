@@ -4,7 +4,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     
     private var window: NSWindow?
     static let windowRect = NSMakeRect(0, 0, NSScreen.main!.frame.width, NSScreen.main!.frame.height)
-
+    
     func applicationDidFinishLaunching(_ notification: Notification) {
         window = NSWindow(contentRect: AppDelegate.windowRect,
                           styleMask: [.miniaturizable, .closable, .resizable, .titled],

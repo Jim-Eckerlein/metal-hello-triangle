@@ -5,7 +5,7 @@ class ViewController: NSViewController {
     
     var renderer: Renderer!
     var mtkView: MTKView!
-
+    
     override func loadView() {
         mtkView = MTKView(frame: AppDelegate.windowRect)
         mtkView.device = MTLCreateSystemDefaultDevice()!

@@ -3,7 +3,7 @@ import MetalKit
 import simd
 
 class Renderer: NSObject, MTKViewDelegate {
-
+    
     public let device: MTLDevice
     let commandQueue: MTLCommandQueue
     var pipelineState: MTLRenderPipelineState
@@ -17,7 +17,7 @@ class Renderer: NSObject, MTKViewDelegate {
     var colorBuffer: MTLBuffer
     
     let t0 = CACurrentMediaTime()
-
+    
     init(metalKitView: MTKView) {
         device = metalKitView.device!
         commandQueue = device.makeCommandQueue()!
@@ -25,7 +25,7 @@ class Renderer: NSObject, MTKViewDelegate {
         metalKitView.depthStencilPixelFormat = MTLPixelFormat.depth32Float_stencil8
         metalKitView.colorPixelFormat = MTLPixelFormat.bgra8Unorm_srgb
         metalKitView.sampleCount = 1
-
+        
         uniformBuffer = device.makeBuffer(length: MemoryLayout<Uniforms>.stride, options: [MTLResourceOptions.storageModeShared])!
         uniforms = UnsafeMutableRawPointer(uniformBuffer.contents()).bindMemory(to: Uniforms.self, capacity: 1)
         
@@ -73,16 +73,16 @@ class Renderer: NSObject, MTKViewDelegate {
         indexBuffer = device.makeBuffer(bytes: indices, length: MemoryLayout<UInt16>.stride * indices.count, options: .cpuCacheModeWriteCombined)!
         positionBuffer = device.makeBuffer(bytes: positions, length: MemoryLayout<SIMD3<Float>>.stride * positions.count, options: .cpuCacheModeWriteCombined)!
         colorBuffer = device.makeBuffer(bytes: colors, length: MemoryLayout<SIMD3<Float>>.stride * colors.count, options: .cpuCacheModeWriteCombined)!
-
+        
         super.init()
     }
-
+    
     private func updateUniforms() {
         let dt = CACurrentMediaTime() - t0;
         let scale = Float((sin(dt * 2) * 0.125 + 0.5))
         uniforms[0].transform = .init(diagonal: .init(.init(repeating: scale), 1))
     }
-
+    
     func draw(in view: MTKView) {
         updateUniforms()
         
@@ -111,7 +111,7 @@ class Renderer: NSObject, MTKViewDelegate {
         commandBuffer.commit()
         commandBuffer.waitUntilCompleted()
     }
-
+    
     func mtkView(_ view: MTKView, drawableSizeWillChange size: CGSize) {
     }
 }
