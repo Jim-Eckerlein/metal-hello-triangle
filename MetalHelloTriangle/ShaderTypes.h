@@ -1,8 +1,4 @@
-//
-//  Header containing types and enum constants shared between Metal shaders and Swift/ObjC source
-//
-#ifndef ShaderTypes_h
-#define ShaderTypes_h
+#pragma once
 
 #ifdef __METAL_VERSION__
 #define NS_ENUM(_type, _name) enum _name : _type _name; enum _name : _type
@@ -30,6 +26,3 @@ typedef struct
 {
     matrix_float4x4 transform;
 } Uniforms;
-
-#endif /* ShaderTypes_h */
-
