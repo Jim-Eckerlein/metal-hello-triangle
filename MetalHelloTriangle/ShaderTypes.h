@@ -10,5 +10,5 @@
 #define VertexAttributeColor 1
 
 struct Uniforms {
-    matrix_float4x4 transform;
+    matrix_float3x3 transform;
 };

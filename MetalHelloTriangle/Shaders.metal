@@ -18,8 +18,7 @@ struct VertexOut {
 vertex VertexOut vertexShader(Vertex in [[stage_in]], constant Uniforms& uniforms [[buffer(BufferIndexUniforms)]]) {
     VertexOut out;
     
-    float4 position = float4(in.position, 1.0);
-    out.position = uniforms.transform * position;
+    out.position = float4(uniforms.transform * in.position, 1.0);
     out.color = in.color;
     
     return out;

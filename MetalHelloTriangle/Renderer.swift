@@ -80,7 +80,7 @@ class Renderer: NSObject, MTKViewDelegate {
     private func updateUniforms() {
         let dt = CACurrentMediaTime() - t0;
         let scale = Float((sin(dt * 2) * 0.125 + 0.5))
-        uniforms[0].transform = .init(diagonal: .init(.init(repeating: scale), 1))
+        uniforms[0].transform = .init(diagonal: .init(repeating: scale))
     }
     
     func draw(in view: MTKView) {
