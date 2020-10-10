@@ -15,6 +15,8 @@ class Renderer: NSObject, MTKViewDelegate {
     var indexBuffer: MTLBuffer
     var positionBuffer: MTLBuffer
     var colorBuffer: MTLBuffer
+    
+    let t0 = CACurrentMediaTime()
 
     init(metalKitView: MTKView) {
         device = metalKitView.device!
@@ -76,7 +78,9 @@ class Renderer: NSObject, MTKViewDelegate {
     }
 
     private func updateUniforms() {
-        uniforms[0].transform = .init(diagonal: .init(x: 0.5, y: 0.5, z: 0.5, w: 1))
+        let dt = CACurrentMediaTime() - t0;
+        let scale = Float((sin(dt * 2) * 0.125 + 0.5))
+        uniforms[0].transform = .init(diagonal: .init(.init(repeating: scale), 1))
     }
 
     func draw(in view: MTKView) {
