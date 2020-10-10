@@ -3,9 +3,10 @@ import Cocoa
 class AppDelegate: NSObject, NSApplicationDelegate {
     
     private var window: NSWindow?
+    static let windowRect = NSMakeRect(0, 0, NSScreen.main!.frame.width, NSScreen.main!.frame.height)
 
     func applicationDidFinishLaunching(_ notification: Notification) {
-        window = NSWindow(contentRect: NSMakeRect(0, 0, NSScreen.main?.frame.width ?? 100, NSScreen.main?.frame.height ?? 100),
+        window = NSWindow(contentRect: AppDelegate.windowRect,
                           styleMask: [.miniaturizable, .closable, .resizable, .titled],
                           backing: .buffered,
                           defer: false)

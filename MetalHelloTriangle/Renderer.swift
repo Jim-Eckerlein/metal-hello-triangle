@@ -16,7 +16,7 @@ class Renderer: NSObject, MTKViewDelegate {
     var positionBuffer: MTLBuffer
     var colorBuffer: MTLBuffer
 
-    init?(metalKitView: MTKView) {
+    init(metalKitView: MTKView) {
         device = metalKitView.device!
         commandQueue = device.makeCommandQueue()!
         
@@ -25,7 +25,6 @@ class Renderer: NSObject, MTKViewDelegate {
         metalKitView.sampleCount = 1
 
         uniformBuffer = device.makeBuffer(length: MemoryLayout<Uniforms>.stride, options: [MTLResourceOptions.storageModeShared])!
-        uniformBuffer.label = "UniformBuffer"
         uniforms = UnsafeMutableRawPointer(uniformBuffer.contents()).bindMemory(to: Uniforms.self, capacity: 1)
         
         vertexDescriptor.attributes[Int(VertexAttributePosition)].format = MTLVertexFormat.float3
@@ -50,7 +49,6 @@ class Renderer: NSObject, MTKViewDelegate {
         let fragmentFunction = library.makeFunction(name: "fragmentShader")
         
         let pipelineDescriptor = MTLRenderPipelineDescriptor()
-        pipelineDescriptor.label = "RenderPipeline"
         pipelineDescriptor.sampleCount = metalKitView.sampleCount
         pipelineDescriptor.vertexFunction = vertexFunction
         pipelineDescriptor.fragmentFunction = fragmentFunction
@@ -63,8 +61,7 @@ class Renderer: NSObject, MTKViewDelegate {
         do {
             pipelineState = try device.makeRenderPipelineState(descriptor: pipelineDescriptor)
         } catch {
-            print("Unable to compile render pipeline state: \(error)")
-            return nil
+            fatalError("Unable to compile render pipeline state: \(error)")
         }
         
         let indices: [UInt16] = [0, 1, 2]
