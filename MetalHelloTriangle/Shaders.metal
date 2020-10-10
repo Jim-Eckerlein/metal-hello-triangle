@@ -5,22 +5,18 @@
 
 using namespace metal;
 
-typedef struct
-{
+struct Vertex {
     float3 position [[attribute(VertexAttributePosition)]];
     float3 color [[attribute(VertexAttributeColor)]];
-} Vertex;
+};
 
-typedef struct
-{
+struct VertexOut {
     float4 position [[position]];
     float3 color;
-} ColorInOut;
+};
 
-vertex ColorInOut vertexShader(Vertex in [[stage_in]],
-                               constant Uniforms & uniforms [[ buffer(BufferIndexUniforms) ]])
-{
-    ColorInOut out;
+vertex VertexOut vertexShader(Vertex in [[stage_in]], constant Uniforms& uniforms [[ buffer(BufferIndexUniforms) ]]) {
+    VertexOut out;
 
     float4 position = float4(in.position, 1.0);
     out.position = uniforms.transform * position;
@@ -29,7 +25,6 @@ vertex ColorInOut vertexShader(Vertex in [[stage_in]],
     return out;
 }
 
-fragment float4 fragmentShader(ColorInOut in [[stage_in]])
-{
+fragment float4 fragmentShader(VertexOut in [[stage_in]]) {
     return float4(in.color, 1.0);
 }
