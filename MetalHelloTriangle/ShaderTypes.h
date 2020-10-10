@@ -6,7 +6,7 @@
 
 #ifdef __METAL_VERSION__
 #define NS_ENUM(_type, _name) enum _name : _type _name; enum _name : _type
-#define NSInteger metal::int32_t
+typedef metal::int32_t NSInteger;
 #else
 #import <Foundation/Foundation.h>
 #endif
