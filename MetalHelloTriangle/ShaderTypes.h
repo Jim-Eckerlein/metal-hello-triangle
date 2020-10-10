@@ -9,7 +9,6 @@
 #define VertexAttributePosition 0
 #define VertexAttributeColor 1
 
-typedef struct
-{
+struct Uniforms {
     matrix_float4x4 transform;
-} Uniforms;
+};

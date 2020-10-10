@@ -44,7 +44,7 @@ class Renderer: NSObject, MTKViewDelegate {
         vertexDescriptor.layouts[Int(BufferIndexMeshColors)].stride = MemoryLayout<SIMD3<Float>>.stride
         vertexDescriptor.layouts[Int(BufferIndexMeshColors)].stepRate = 1
         vertexDescriptor.layouts[Int(BufferIndexMeshColors)].stepFunction = MTLVertexStepFunction.perVertex
-
+        
         let library = device.makeDefaultLibrary()!
         
         let vertexFunction = library.makeFunction(name: "vertexShader")

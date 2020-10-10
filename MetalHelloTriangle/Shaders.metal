@@ -1,7 +1,7 @@
 #include <metal_stdlib>
 #include <simd/simd.h>
 
-#import "ShaderTypes.h"
+#include "ShaderTypes.h"
 
 using namespace metal;
 
@@ -15,7 +15,7 @@ struct VertexOut {
     float3 color;
 };
 
-vertex VertexOut vertexShader(Vertex in [[stage_in]], constant Uniforms& uniforms [[ buffer(BufferIndexUniforms) ]]) {
+vertex VertexOut vertexShader(Vertex in [[stage_in]], constant Uniforms& uniforms [[buffer(BufferIndexUniforms)]]) {
     VertexOut out;
 
     float4 position = float4(in.position, 1.0);
